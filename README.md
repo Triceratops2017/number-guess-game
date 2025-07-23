@@ -29,9 +29,27 @@
 
 1. 下载并安装微信开发者工具
 2. 克隆本项目到本地
-3. 在微信开发者工具中导入项目
-4. 选择项目目录并设置AppID
-5. 点击预览即可在手机上体验
+3. 配置项目：
+   ```bash
+   # 复制配置模板
+   cp project.config.example.json project.config.json
+   
+   # 编辑 project.config.json，将 YOUR_WECHAT_APPID_HERE 替换为你的微信小程序 AppID
+   ```
+4. 在微信开发者工具中导入项目
+5. 选择项目目录
+6. 点击预览即可在手机上体验
+
+## 配置说明
+
+### 必需配置
+- **AppID**: 在 `project.config.json` 中配置你的微信小程序 AppID
+- **录音权限**: 在 `app.json` 中已配置录音权限声明
+
+### 安全说明
+- `project.config.json` 中的 AppID 已使用占位符
+- 请勿将包含真实 AppID 的配置文件提交到公开仓库
+- 私有配置文件已添加到 `.gitignore`
 
 ## 项目结构
 
