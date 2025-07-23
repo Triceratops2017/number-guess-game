@@ -1,0 +1,16 @@
+/**app.wxss**/
+page {
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+  min-height: 100vh;
+  font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 40rpx;
+}

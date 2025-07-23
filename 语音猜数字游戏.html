@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字猜测游戏 - 语音交互</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .guess-container {
+            margin: 30px 0;
+        }
+        
+        .guess-number {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #ff7e5f;
+            text-shadow: 0 0 20px rgba(255, 126, 95, 0.7);
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .status {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+        
+        .mic-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 30px auto;
+        }
+        
+        .mic {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 126, 95, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .mic:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 126, 95, 0.8);
+        }
+        
+        .mic:active {
+            transform: scale(0.95);
+        }
+        
+        .mic-icon {
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .pulse {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 126, 95, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .shaking {
+            animation: shake 0.666s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+        
+        .counter {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #feb47b;
+        }
+        
+        .success-message {
+            font-size: 2rem;
+            color: #4cff00;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 0 10px rgba(76, 255, 0, 0.7);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .guess-number {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 数字猜测游戏</h1>
+        
+        <div class="instructions">
+            <p>请在心里想一个 1 到 100 之间的整数</p>
+            <p>我会尝试猜测这个数字，你只需要说"高了"或"低了"</p>
+            <p>当我猜对时，会有惊喜哦！</p>
+        </div>
+        
+        <div class="guess-container">
+            <div class="guess-number" id="guessNumber">50</div>
+            <div class="status" id="status">我在猜测你的数字...</div>
+            <div class="counter" id="counter">猜测次数: 1</div>
+        </div>
+        
+        <div class="mic-container">
+            <div class="pulse"></div>
+            <div class="mic" id="microphone">
+                <div class="mic-icon">🎤</div>
+            </div>
+        </div>
+        
+        <div class="success-message hidden" id="successMessage">🎉 猜对啦！</div>
+        
+        <div class="footer">
+            <p>纯语音交互 - 无需键盘或鼠标</p>
+        </div>
+    </div>
+    
+    <audio id="successSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // 游戏状态
+        let low = 1;
+        let high = 100;
+        let guess = 50;
+        let count = 1;
+        let gameFinished = false;
+        
+        // DOM元素
+        const guessNumberElement = document.getElementById('guessNumber');
+        const statusElement = document.getElementById('status');
+        const counterElement = document.getElementById('counter');
+        const microphoneElement = document.getElementById('microphone');
+        const successMessageElement = document.getElementById('successMessage');
+        const successSound = document.getElementById('successSound');
+        const body = document.body;
+        
+        // 初始化语音识别
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'zh-CN';
+        
+        // 更新显示
+        function updateDisplay() {
+            guessNumberElement.textContent = guess;
+            counterElement.textContent = `猜测次数: ${count}`;
+        }
+        
+        // 开始语音识别
+        function startListening() {
+            try {
+                recognition.start();
+                statusElement.textContent = "正在监听... 请说'高了'或'低了'";
+                microphoneElement.style.background = "linear-gradient(135deg, #00c9ff, #92fe9d)";
+            } catch (error) {
+                statusElement.textContent = "语音识别启动失败，请刷新页面重试";
+                console.error("语音识别启动失败:", error);
+            }
+        }
+        
+        // 处理语音识别结果
+        recognition.onresult = function(event) {
+            const last = event.results.length - 1;
+            const command = event.results[last][0].transcript.trim();
+            
+            console.log("识别到语音:", command);
+            
+            if (gameFinished) return;
+            
+            if (command.includes("高") || command.includes("大")) {
+                high = guess - 1;
+                if (low > high) {
+                    finishGame();
+                } else {
+                    makeGuess();
+                }
+            } else if (command.includes("低") || command.includes("小")) {
+                low = guess + 1;
+                if (low > high) {
+                    finishGame();
+                } else {
+                    makeGuess();
+                }
+            } else {
+                statusElement.textContent = `未识别指令: "${command}"。请说"高了"或"低了"`;
+            }
+        };
+        
+        // 语音识别错误处理
+        recognition.onerror = function(event) {
+            console.error("语音识别错误:", event.error);
+            statusElement.textContent = "语音识别出错，请点击麦克风重新开始";
+            microphoneElement.style.background = "linear-gradient(135deg, #ff7e5f, #feb47b)";
+        };
+        
+        // 语音识别结束
+        recognition.onend = function() {
+            if (!gameFinished) {
+                statusElement.textContent = "语音识别已停止，点击麦克风继续";
+                microphoneElement.style.background = "linear-gradient(135deg, #ff7e5f, #feb47b)";
+            }
+        };
+        
+        // 进行下一次猜测
+        function makeGuess() {
+            if (low > high) {
+                finishGame();
+                return;
+            }
+            
+            guess = Math.floor((low + high) / 2);
+            count++;
+            updateDisplay();
+            statusElement.textContent = "我在猜测你的数字...";
+            
+            // 重新开始监听
+            setTimeout(() => {
+                recognition.stop();
+                startListening();
+            }, 1000);
+        }
+        
+        // 完成游戏
+        function finishGame() {
+            gameFinished = true;
+            recognition.stop();
+            
+            // 显示成功消息
+            successMessageElement.classList.remove('hidden');
+            statusElement.textContent = "太棒了！我猜对了！";
+            
+            // 播放音效
+            successSound.play();
+            
+            // 页面抖动效果
+            body.classList.add('shaking');
+            
+            // 3秒后移除抖动效果
+            setTimeout(() => {
+                body.classList.remove('shaking');
+            }, 666);
+            
+            // 改变麦克风样式
+            microphoneElement.style.background = "linear-gradient(135deg, #4cff00, #92fe9d)";
+            microphoneElement.innerHTML = '<div class="mic-icon">✅</div>';
+        }
+        
+        // 麦克风点击事件
+        microphoneElement.addEventListener('click', function() {
+            if (gameFinished) return;
+            
+            if (recognition.state === 'listening') {
+                recognition.stop();
+                statusElement.textContent = "语音识别已停止，点击麦克风继续";
+                microphoneElement.style.background = "linear-gradient(135deg, #ff7e5f, #feb47b)";
+            } else {
+                startListening();
+            }
+        });
+        
+        // 初始化游戏
+        updateDisplay();
+        statusElement.textContent = "点击麦克风开始游戏";
+    </script>
+</body>
+</html>

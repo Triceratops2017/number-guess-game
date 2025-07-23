@@ -1,0 +1,35 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="game-container">
+    <view class="title">🔮 数字猜测游戏</view>
+    
+    <view class="instructions">
+      <text>请在心里想一个 1 到 100 之间的整数</text>
+      <text>我会尝试猜测这个数字，你只需要说"高了"或"低了"</text>
+      <text>当我猜对时，会有惊喜哦！</text>
+    </view>
+    
+    <view class="guess-container">
+      <view class="guess-number {{shaking ? 'shaking' : ''}}">{{guessNumber}}</view>
+      <view class="status">{{statusText}}</view>
+      <view class="counter">猜测次数: {{guessCount}}</view>
+    </view>
+    
+    <view class="mic-container">
+      <view class="pulse {{isListening ? '' : 'hidden'}}"></view>
+      <view class="mic {{micClass}}" bindtap="toggleRecording">
+        <text class="mic-icon">{{micIcon}}</text>
+      </view>
+    </view>
+    
+    <view class="success-message {{gameFinished ? '' : 'hidden'}}">🎉 猜对啦！</view>
+    
+    <view class="footer">
+      <text>纯语音交互 - 无需键盘或鼠标</text>
+    </view>
+    
+    <view class="reset-btn" bindtap="resetGame" wx:if="{{gameFinished}}">
+      重新开始
+    </view>
+  </view>
+</view>
