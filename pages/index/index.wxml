@@ -1,6 +1,27 @@
 <!--index.wxml-->
 <view class="container">
-  <view class="game-container">
+  <!-- 烟花动效层 -->
+  <view class="fireworks-container {{fireworks ? 'active' : 'hidden'}}">
+    <view class="firework firework-1"></view>
+    <view class="firework firework-2"></view>
+    <view class="firework firework-3"></view>
+    <view class="firework firework-4"></view>
+    <view class="firework firework-5"></view>
+  </view>
+  
+  <!-- 彩带动效层 -->
+  <view class="confetti-container {{confetti ? 'active' : 'hidden'}}">
+    <view class="confetti confetti-1">🎊</view>
+    <view class="confetti confetti-2">🎉</view>
+    <view class="confetti confetti-3">✨</view>
+    <view class="confetti confetti-4">🌟</view>
+    <view class="confetti confetti-5">💫</view>
+    <view class="confetti confetti-6">🎊</view>
+    <view class="confetti confetti-7">🎉</view>
+    <view class="confetti confetti-8">✨</view>
+  </view>
+
+  <view class="game-container {{celebrating ? 'celebrating' : ''}}">
     <view class="title">🔮 数字猜测游戏</view>
     
     <view class="instructions">
@@ -10,7 +31,18 @@
     </view>
     
     <view class="guess-container">
-      <view class="guess-number {{shaking ? 'shaking' : ''}}">{{guessNumber}}</view>
+      <view class="guess-number {{shaking ? 'shaking' : ''}} {{numberExploding ? 'exploding' : ''}}">
+        {{guessNumber}}
+        <!-- 数字爆炸粒子效果 -->
+        <view class="explosion-particles {{numberExploding ? 'active' : 'hidden'}}">
+          <view class="particle particle-1">💥</view>
+          <view class="particle particle-2">⭐</view>
+          <view class="particle particle-3">✨</view>
+          <view class="particle particle-4">🌟</view>
+          <view class="particle particle-5">💫</view>
+          <view class="particle particle-6">⚡</view>
+        </view>
+      </view>
       <view class="status">{{statusText}}</view>
       <view class="counter">猜测次数: {{guessCount}}</view>
     </view>
@@ -20,16 +52,20 @@
       <view class="mic {{micClass}}" bindtap="toggleRecording">
         <text class="mic-icon">{{micIcon}}</text>
       </view>
+      <!-- 成功光环效果 -->
+      <view class="success-halo {{gameFinished ? 'active' : 'hidden'}}"></view>
     </view>
     
-    <view class="success-message {{gameFinished ? '' : 'hidden'}}">🎉 猜对啦！</view>
+    <view class="success-message {{gameFinished ? 'bounce' : 'hidden'}}">
+      🏆 完美胜利！🏆
+    </view>
     
     <view class="footer">
       <text>纯语音交互 - 无需键盘或鼠标</text>
     </view>
     
-    <view class="reset-btn" bindtap="resetGame" wx:if="{{gameFinished}}">
-      重新开始
+    <view class="reset-btn {{gameFinished ? 'glow' : 'hidden'}}" bindtap="resetGame">
+      🎮 再来一局
     </view>
   </view>
 </view>

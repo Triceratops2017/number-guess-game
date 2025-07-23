@@ -14,8 +14,6 @@
       "desc": "需要使用录音功能进行语音识别"
     }
   },
-  "requiredPrivateInfos": [
-    "getRecorderManager"
-  ],
+
   "sitemapLocation": "sitemap.json"
 }
